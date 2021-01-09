@@ -120,17 +120,17 @@ end --copy_prev_beanstalk_values
 --this is only run once at world creation (unless you delete the beanstalk file)
 --********************************
 function beanstalk.read_beanstalk_values()
-	minetest.log("beanstalk-> reading beanstalk value file")
+	minetest.log("info", "beanstalk-> reading beanstalk value file")
 	local str   --str will be the string read from the file
 	local p     --position
-	local tag   --the stuff to the left of the = sight, could be beasntalk_level, count, bot, etc
+	local tag   --the stuff to the left of the = sign, could be beanstalk_level, count, bot, etc
 	local value --the stuff to the right of the = sign
 	local prevtag=""
 	local lv=0  --lv is what level of the world you are on
-	local r --will hold what line of the ranomized value table we are loading
+	local r --will hold what line of the randomized value table we are loading
 	bnst_values={}
 	bnst_values.level_max=0
-		minetest.log("beanstalk-> file wrldpth="..minetest.get_worldpath().."/beanstalk_values.conf")
+		minetest.log("beanstalk-> file worldpth="..minetest.get_worldpath().."/beanstalk_values.conf")
 		minetest.log("beanstalk-> file modpath="..minetest.get_modpath("beanstalk").."/beanstalk_values.conf")  
 	--first we look to see if there is a beanstalks_values file in the world path
 	local file = io.open(minetest.get_worldpath().."/beanstalk_values.conf", "r")
@@ -139,16 +139,16 @@ function beanstalk.read_beanstalk_values()
 		minetest.log("beanstalk-> loading beanstalk_values from worldpath:")
 	else  
 		file = io.open(minetest.get_modpath("beanstalk").."/beanstalk_values.conf", "r")    
-		if file then minetest.log("beanstalk-> loading beanstalk_values from modpath") 
-		else minetest.log("beanstalk-> unable to find beanstalk_values file in worldpath or modpath.  This is bad")
+		if file then minetest.log("info", "beanstalk-> loading beanstalk_values from modpath") 
+		else minetest.log("error", "beanstalk-> unable to find beanstalk_values file in worldpath or modpath.  This is bad")
 		end --if file (modpath)
 	end --if file (worldpath)   
 	if file then  
 		for line in file:lines() do
 			str = line
-			minetest.log("beanstalk-> str:"..str)
+			minetest.log("verbose", "beanstalk-> str:"..str)
 			--eliminate comments
-			p=string.find(str,"%-%-")  -- because hypen is a magic character in lua you have to escape it, this searches for --
+			p=string.find(str,"%-%-")  -- because hyphen is a magic character in lua you have to escape it, this searches for --
 			if p~=nil then str=string.sub(str,1,p-1) end              
 			--split based on =, every line with data has an = in it
 			p=string.find(str,"=")
@@ -170,7 +170,7 @@ function beanstalk.read_beanstalk_values()
 						--if the user does not set a value in a level, then take the value from the previous level
 						beanstalk.copy_prev_bnst_values(lv-1)
 					end --if
-					minetest.log("beanstalk->   lv="..lv.." (new level)")                  
+					minetest.log("verbose", "beanstalk->   lv="..lv.." (new level)")                  
 				else --tag but not beanstalk_level: process this line as a new entry for this beanstalk level             
 					if tag~="" then --this is a new tag, not a blank continuation
 						r=1 --new tag, first row
@@ -179,7 +179,7 @@ function beanstalk.read_beanstalk_values()
 						bnst_values[lv][tag]={}                              
 						bnst_values[lv][tag].chancemax=1  --chancemax is what is the maximum random number we need to roll on the chance table of values, default=1
 						bnst_values[lv][tag].rowmax=r
-						--now initialize [tag]for these items so we can use as a multi-dementional array [tag][r] 
+						--now initialize [tag]for these items so we can use as a multi-dimensional array [tag][r] 
 						bnst_values[lv][tag].chancefrm={}
 						bnst_values[lv][tag].chanceto={}
 						bnst_values[lv][tag].valfrm={}
@@ -205,8 +205,8 @@ function beanstalk.read_beanstalk_values()
 					local pbar=string.find(value,"|")  --find the vert bar                       
 					if pbar==nil then --we have a simple tag with just one value like vnode=bnst_vine1, or a single row with a range, like stemtot=3;5. fake a row for it          
 						if r>1 then
-							minetest.log("beanstalk-> ERROR:"..str)
-							minetest.log("beanstalk->  lv="..lv.." tag="..tag.." r="..r.." ERROR! should never have an entry with blank tag and no bar!")
+							minetest.log("error", "beanstalk-> ERROR:"..str)
+							minetest.log("error", "beanstalk->  lv="..lv.." tag="..tag.." r="..r.." ERROR! should never have an entry with blank tag and no bar!")
 						else --r==1
 							--minetest.log("beanstalk-> simple entry, no bar, value="..value);
 							--no chance table, so we make one up just to make this work the same as all the others  example: snode=bnst_stalk1
@@ -247,15 +247,15 @@ function beanstalk.read_beanstalk_values()
 							bnst_values[lv][tag].valto[r]=valfromto
 						end --semicol
 					end --bar
-				minetest.log("beanstalk->   lv="..lv.." tag="..tag.." r="..r.." chancefrm="..bnst_values[lv][tag].chancefrm[r]..
+				minetest.log("verbose", "beanstalk->   lv="..lv.." tag="..tag.." r="..r.." chancefrm="..bnst_values[lv][tag].chancefrm[r]..
 						" chanceto="..bnst_values[lv][tag].chanceto[r].." valfrm="..bnst_values[lv][tag].valfrm[r].." valto="..bnst_values[lv][tag].valto[r])
-				minetest.log("beanstalk->      chancemax="..bnst_values[lv][tag].chancemax.." rowmax="..bnst_values[lv][tag].rowmax)                  
+				minetest.log("verbose", "beanstalk->      chancemax="..bnst_values[lv][tag].chancemax.." rowmax="..bnst_values[lv][tag].rowmax)                  
 				end --if tag="beanstalk_level"  
 			end --equals    
 		end -- for line in file:lines() do
 	if lv>1 then beanstalk.copy_prev_bnst_values(bnst_values.level_max) end  --got to copy previous values for the last one
 	end --if file 
-	minetest.log("beanstalk-> beanstalk_values loaded bnst_values.level_max="..bnst_values.level_max)
+	minetest.log("verbose", "beanstalk-> beanstalk_values loaded bnst_values.level_max="..bnst_values.level_max)
 	beanstalk.displaybv()
 end --read_beanstalk_values
 
@@ -282,7 +282,7 @@ function beanstalk.seednum(numin)
 end  
 
 
---this is used to retreave beanstalk values.  It rolls random results from bnst_values table
+--this is used to retrieve beanstalk values.  It rolls random results from bnst_values table
 --pass b=0 when calling for values in bnst[lv]
 --********************************
 function beanstalk.get_bval(lv,b,tag)  
@@ -316,6 +316,10 @@ function beanstalk.get_bval(lv,b,tag)
 	--minetest.log("beanstalk-> bval: tagseed  ="..tagseed)
 	--minetest.log("beanstalk-> bval: seed     ="..seed)  
  
+	if not bnst_values[lv][tag] then
+		return -- tag not found
+	end
+ 
 	local rnd=math.random(1,bnst_values[lv][tag].chancemax)   
 	local r=1
  -- minetest.log("beanstalk-> rowmax="..bnst_values[lv][tag].rowmax)
@@ -324,7 +328,7 @@ function beanstalk.get_bval(lv,b,tag)
 		r=r+1
 	end--while
 	--minetest.log("beanstalk-> bval: r="..r)
-	--I'm not going to waste time checking if r<=varin.maxrows because that shouldnt be possible
+	--I'm not going to waste time checking if r<=varin.maxrows because that shouldn't be possible
 	--may change my mind on that later.
 	local rslt=""
 	local valfrm=bnst_values[lv][tag].valfrm[r]
@@ -350,7 +354,7 @@ function beanstalk.get_bval(lv,b,tag)
 	end --if b>0  
 	local rslt
 	--only call string_math if tag is not one of our text tags
-	if tag~="snode" and tag~="vnode" and tag~="enforce_min_rot1rad" then
+	if tag~="snode" and tag~="vnode" and tag~="enforce_min_rot1rad" and tag~="rnode" and tag~="rvnode" then
 		valfrm=luautils.string_math(valfrm,vars)
 		valto=luautils.string_math(valto,vars)
 	end  
@@ -412,18 +416,30 @@ function beanstalk.calculated_constants_bylevel()
 		bnst[lv].count=beanstalk.get_bval(lv,0,"count")
 		bnst[lv].bot=beanstalk.get_bval(lv,0,"bot")
 		bnst[lv].height=beanstalk.get_bval(lv,0,"height")
+		bnst[lv].rheight=beanstalk.get_bval(lv,0,"rheight")
 		--*!* should put some logging or at least error catching around these?
-		minetest.log("beanstalk-> ccbl snode="..beanstalk.get_bval(lv,0,"snode").."  vnode="..beanstalk.get_bval(lv,0,"vnode"))
+		minetest.log("verbose", "beanstalk-> ccbl snode="..beanstalk.get_bval(lv,0,"snode").."  vnode="..beanstalk.get_bval(lv,0,"vnode"))
 		bnst[lv].snode=minetest.get_content_id(beanstalk.get_bval(lv,0,"snode"))
 		bnst[lv].vnode=minetest.get_content_id(beanstalk.get_bval(lv,0,"vnode"))
+		
+		local rnode = beanstalk.get_bval(lv,0,"rnode")
+		local rvnode = beanstalk.get_bval(lv,0,"rvnode")
+		if rnode~=nil and rvnode~=nil then
+			bnst[lv].rnode = minetest.get_content_id(rnode)
+			bnst[lv].rvnode = minetest.get_content_id(rvnode)
+			minetest.log("verbose", "beanstalk-> ccbl rnode="..rnode.." rvnode="..rvnode)
+		end
 
 		bnst[lv].per_row=math.floor(math.sqrt(bnst[lv].count))  --beanstalks per row are the sqrt of beanstalks per level
 		bnst[lv].count=bnst[lv].per_row*bnst[lv].per_row  --recalculate to a perfect square
 		--so yes, the count you set can be changed
 		bnst[lv].area=62000/bnst[lv].per_row
 		bnst[lv].top=bnst[lv].bot+bnst[lv].height-1
-		minetest.log("beanstalk-> calculated constants by level lv="..lv.." per_row="..bnst[lv].per_row..
-			" count="..bnst[lv].count.." area="..bnst[lv].area.." top="..bnst[lv].top)
+		if bnst[lv].rheight then
+			bnst[lv].root_top=bnst[lv].bot+bnst[lv].rheight
+		end
+		minetest.log("verbose", "beanstalk-> calculated constants by level lv="..lv.." per_row="..bnst[lv].per_row..
+			" count="..bnst[lv].count.." area="..bnst[lv].area.." top="..bnst[lv].top.." root_top="..tostring(bnst[lv].root_top))
 	end --for
 end --calculated_constants_bylevel
 
@@ -436,12 +452,12 @@ end --calculated_constants_bylevel
 --********************************
 function beanstalk.calculated_constants_bybnst()
 	--calculated constants by beanstalk
-	minetest.log("beanstalk-> calculated constants by beanstalk")
-	minetest.log("beanstalk-> list --------------------------------------")
+	minetest.log("verbose", "beanstalk-> calculated constants by beanstalk")
+	minetest.log("verbose", "beanstalk-> list --------------------------------------")
 	for lv=1,bnst.level_max do  --loop through the levels
-		minetest.log("***beanstalk-> level="..lv.." ***")    
+		minetest.log("verbose", "***beanstalk-> level="..lv.." ***")    
 		for b=1,bnst[lv].count do   --loop through the beanstalks
-			minetest.log("beanstalk->   lv="..lv.." b="..b)     
+			minetest.log("verbose", "beanstalk->   lv="..lv.." b="..b)     
 			bnst[lv][b].rot1min=bnst[lv][b].rot1radius --default if we dont set crazy
 			bnst[lv][b].rot1max=bnst[lv][b].rot1radius --default if we dont set crazy
 			bnst[lv][b].rot2min=bnst[lv][b].rot2radius --default if we dont set crazy
@@ -494,10 +510,10 @@ function beanstalk.calculated_constants_bybnst()
 			logstr=logstr.." rot2dir="..bnst[lv][b].rot2dir.." rot2radius="..bnst[lv][b].rot2radius.." rot2yper360="..bnst[lv][b].rot2yper360
 			logstr=logstr.." rot2crazy="..bnst[lv][b].rot2crazy
 			bnst[lv][b].desc=logstr
-			minetest.log(logstr)
+			minetest.log("verbose", logstr)
 		end --for b
 	end --for lv
-	minetest.log("beanstalk-> list --------------------------------------")
+	minetest.log("verbose", "beanstalk-> list --------------------------------------")
 end --calculated_constants_bybnst
 
 
@@ -509,7 +525,7 @@ end --calculated_constants_bybnst
 --to change positions or anything else disruptive like that.
 --********************************
 function beanstalk.write_beanstalks()
-	minetest.log("beanstalk-> write_beanstalks")
+	minetest.log("verbose", "beanstalk-> write_beanstalks")
 	local file = io.open(minetest.get_worldpath().."/beanstalks", "w")
 	if file then
 		--wipe out variables that we will recalculate
@@ -564,7 +580,7 @@ end --write_beanstalks
 --beanstalk_values file
 --********************************
 function beanstalk.create_beanstalks()
-	minetest.log("beanstalk-> create beanstalks")
+	minetest.log("verbose", "beanstalk-> create beanstalks")
 	local logstr
 	local lv=1
 	
@@ -707,13 +723,13 @@ end --create_beanstalks
 --get beanstalks, from file if exists, otherwise generate
 --********************************
 function beanstalk.read_beanstalks()
-	minetest.log("beanstalk-> reading beanstalks file")
+	minetest.log("info", "beanstalk-> reading beanstalks file")
 	local file = io.open(minetest.get_worldpath().."/beanstalks", "r")
 	if file then
 		bnst = minetest.deserialize(file:read("*all"))
 		-- check if it was an empty file because empty files can crash server
 		if bnst == nil then
-			minetest.log("beanstalk-> ERROR: beanstalk file exists but is empty, will recreate")
+			minetest.log("error", "beanstalk-> ERROR: beanstalk file exists but is empty, will recreate")
 			beanstalk.create_beanstalks()
 		else  --file exists and was loaded
 			beanstalk.calculated_constants_bylevel()
@@ -721,7 +737,7 @@ function beanstalk.read_beanstalks()
 		end  --if bnst==nil
 		file:close()
 	else --file does not exist
-		minetest.log("beanstalk-> beanstalk file does not exist, creating it")
+		minetest.log("info", "beanstalk-> beanstalk file does not exist, creating it")
 		beanstalk.create_beanstalks()
 	end --if file
 end --read_beanstalks
@@ -735,19 +751,25 @@ end --read_beanstalks
 --surfaces, but not where you have nice climbable stair steps.
 --parms: lv=current level  x,y,z pos of this node, vcx vcz center of this vine, also pass area and data so we can check below
 --********************************
-function beanstalk.checkvines(lv, x,y,z, vcx,vcz, area,data)
+function beanstalk.checkvines(lv, x,y,z, vcx,vcz, area,data, c_stem,c_vine)
 	local changed=false
 	local vn = area:index(x, y, z)  --we get the node we are checking
-	local vndown = area:index(x, y-1, z)  --and the node right below the one we are checking
+	local vndown = vn - area.ystride  --and the node right below the one we are checking
+	
+	local data_vn = data[vn] -- c_id of node we're checking
+	local data_vndown = data[vndown] -- c_id of the node below the one we're checking
+	local bnst_lv = bnst[lv] -- beanstalk level definition
+	
+	local vine_to_place = nil
 	--if vn is not beanstalk or vines, and vndown is not beanstalk, then we will place a vine
-	if data[vn]~=bnst[lv].snode and data[vn]~=bnst[lv].vnode and data[vndown]~=bnst[lv].snode then
-		data[vn]=bnst[lv].vnode
+	if data_vn~=c_stem and data_vn~=c_vine and data_vndown~=c_stem then
+		data[vn]=c_vine
 		changed=true
 		local pos={x=x,y=y,z=z}
 		local node=minetest.get_node(pos)
 		--we have the vine in place, but we need to rotate it with the vines
 		--against the big beanstalk node.
-		--if diff x is bigger than diff z we put against the x face, otherwize z
+		--if diff x is bigger than diff z we put against the x face, otherwise z
 		--if diff is negative we put against plus face, otherwise minus face
 		--facedir 0=top 1=bot 2=+x 3=-x 4=+z 5=-z
 		local facedir=2
@@ -773,14 +795,13 @@ function beanstalk.gen_beanstalk_realms(parms)
   beanstalk.gen_beanstalk(parms.chunk_minp,parms.chunk_maxp,parms.seed,parms)
 end --gen_beanstalk
 
-
 --this is the function that will run EVERY time a chunk is generated.
 --see at the bottom of this program where it is registered with:
 --minetest.register_on_generated(gen_beanstalk)
 --minp is the min point of the chunk, maxp is the max point of the chunk
 --********************************
 function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
-	--we dont want to waste any time in this function if the chunk doesnt have
+	--we don't want to waste any time in this function if the chunk doesn't have
 	--a beanstalk in it.
 	--so first we loop through the levels, if our chunk is not on a level where beanstalks
 	--exist, we just do a return
@@ -795,7 +816,7 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 
 	--now we know we are on a level with beanstalks, so we now need to check each beanstalk to
 	--see if they intersect this chunk, if not, we return and waste no more cpu.
-	--I think this could be made more efficent, seems we should be able to zero in on which
+	--I think this could be made more efficient, seems we should be able to zero in on which
 	--beanstalk to check better than just looping through them.
 	--why are we looping through lv again?  because beanstalk levels can overlap (not beanstalks themselves)
 	--but usually a beanstalk on level 1 will start below the surface of level 1, and extend ABOVE the surface of level 1
@@ -833,11 +854,11 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 
 	--minetest.log("bnst [beanstalk_gen] BEGIN chunk minp ("..x0..","..y0..","..z0..") maxp ("..x1..","..y1..","..z1..")") --tell people you are generating a chunk
 	local vm,emin,emax,area
-	--if realms==nil then --removing realms functionality for now, better to run independant
+	--if realms==nil then --removing realms functionality for now, better to run independent
 		--This actually initializes the LVM
-		vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-		area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
-		vm:get_data(vm_data)
+	vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+	area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+	vm:get_data(vm_data)
 --	else
 --		vm=parms.vm
 --		area=parms.area
@@ -868,6 +889,12 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 
 	stemthiny=bnst[lv].top-(bnst[lv][b].stemradius*4) --for the "taper off" logic below
 
+	local c_rootnode = bnst[lv].rnode
+	local c_rootvinenode = bnst[lv].rvnode
+	local c_stemnode = bnst[lv].snode
+	local c_vinenode = bnst[lv].vnode
+	local root_height = bnst[lv].root_top
+
 	repeat  --this top repeat is where we loop through the chunk based on y
 
 		--the purpose of this bit of code is to "taper off" the end of the beanstalk at the very top
@@ -882,7 +909,7 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 		rot1radius=bnst[lv][b].rot1radius
 		if bnst[lv][b].rot1crazy>0 then
 			if bnst[lv][b].noise1==nil then
-				--couldnt create the noise before mapgen, so doing it now (and only once per beanstalk)
+				--couldn't create the noise before mapgen, so doing it now (and only once per beanstalk)
 				--I really only need 1d noise.  chulens defines the area of noise generated
 				--I am defining the x axis only
 				local chulens = {x=bnst[lv].height, y=1, z=1}
@@ -904,7 +931,7 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 		rot2radius=bnst[lv][b].rot2radius
 		if bnst[lv][b].rot2crazy>0 then
 			if bnst[lv][b].noise2==nil then
-				--couldnt create the noise before mapgen, so doing it now
+				--couldn't create the noise before mapgen, so doing it now
 				local chulens = {x=bnst[lv].height, y=1, z=1}
 				local minposxz = {x=0, y=0}
 				np_crazy.seed=bnst[lv][b].seed*2  --times 2 so it will be different than noise1
@@ -940,25 +967,34 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 			stemz[v]=cz+rot1radius*math.sin(a1*math.pi/180)
 		end --for v
 
-		--we are inside the repeat loop that loops through the chunc based on y (from bottom up)
+		--we are inside the repeat loop that loops through the chunk based on y (from bottom up)
 		--these two for loops loop through the chunk based x and z
 		--changedthis says if there was a change in the z loop.  changedany says if there was a change in the whole chunk
 		for x=x0, x1 do
 			for z=z0, z1 do
+				local c_stem
+				local c_vine
+				if root_height and y < root_height then
+					c_stem = c_rootnode
+					c_vine = c_rootvinenode
+				else
+					c_stem = c_stemnode
+					c_vine = c_vinenode
+				end
 				local vi = area:index(x, y, z) -- This accesses the node at a given position
 				local changedthis=false
 				local v=1
 				repeat  --loops through the vines until we set the node or run out of vines
 					local dist=math.sqrt((x-stemx[v])^2+(z-stemz[v])^2)
 					if dist <= stemradius then  --inside stalk
-						vm_data[vi]=bnst[lv].snode
+						vm_data[vi]= c_stem
 						changedany=true
 						changedthis=true
 						--minetest.log("--- -- stalk placed at x="..x.." y="..y.." z="..z.." (v="..v..")")
 					--this else says to check for adding climbing vines if we are 1 node outside stalk of a beanstalk vine
 					--(it is confusing that I call them both vine.  I should have called it stalks and vines)
 					elseif dist<=(stemradius+1) then --one node outside stalk
-						if beanstalk.checkvines(lv, x,y,z, stemx[v],stemz[v], area,vm_data)==true then
+						if beanstalk.checkvines(lv, x,y,z, stemx[v],stemz[v], area,vm_data, c_stem,c_vine)==true then
 							changedany=true
 							changedthis=true
 							--minetest.log("--- -- vine placed at x="..x.." y="..y.." z="..z.."(v="..v..")")
@@ -1019,24 +1055,31 @@ end --list_beanstalks
 --********************************
 function beanstalk.go_beanstalk(playername,param)
 	local player = minetest.get_player_by_name(playername)
-	if param=="" then minetest.chat_send_player(playername,"format is go_beanstalk <lv>,<b>")
-	else
-		--local lv, b = param:find("^(-?%d+)[, ](-?%d+)$")  --splits param on comma or space
-		local slv,sb = string.match(param,"([^,]+),([^,]+)")
-		local lv=tonumber(slv)
-		local b=tonumber(sb)
-		if (lv<1) or (lv>bnst.level_max) or (b<1) or (b>bnst[lv].count) then
-			minetest.chat_send_player(playername,"No such beanstalk as "..lv..","..b)
-			return
-		end --if (lv<1)
-		local p={x=bnst[lv][b].pos.x,y=bnst[lv][b].pos.y,z=bnst[lv][b].pos.z}
-		--NEVER do local p=bnst[lv][b].pos passes by reference not value and you will change the original bnst pos!
-		p.x=p.x+bnst[lv][b].fullradius+2
-		p.y=p.y+13
-		player:set_pos(p)
-		--player:set_look_yaw(100)  this is depricated, but set_look_horizontal uses radians
-		player:set_look_horizontal(1.75)
-	end --if
+	if param=="" then
+		minetest.chat_send_player(playername,"format is go_beanstalk <lv>,<b>")
+		return
+	end
+	--local lv, b = param:find("^(-?%d+)[, ](-?%d+)$")  --splits param on comma or space
+	local slv,sb = string.match(param,"([^,]+),([^,]+)")
+	local lv=tonumber(slv)
+	local b=tonumber(sb)
+	
+	if lv == nil or b == nil then
+		minetest.chat_send_player(playername,"format is go_beanstalk <lv>,<b>")
+		return
+	end
+	
+	if (lv<1) or (lv>bnst.level_max) or (b<1) or (b>bnst[lv].count) then
+		minetest.chat_send_player(playername,"No such beanstalk as "..lv..","..b)
+		return
+	end --if (lv<1)
+	local p={x=bnst[lv][b].pos.x,y=bnst[lv][b].pos.y,z=bnst[lv][b].pos.z}
+	--NEVER do local p=bnst[lv][b].pos passes by reference not value and you will change the original bnst pos!
+	p.x=p.x+bnst[lv][b].fullradius+2
+	p.y=p.y+13
+	player:set_pos(p)
+	--player:set_look_yaw(100)  this is depricated, but set_look_horizontal uses radians
+	player:set_look_horizontal(1.75)
 end --go_beanstalk
 
 
@@ -1053,7 +1096,7 @@ minetest.register_chatcommand("list_beanstalks", {
 
 --register the go_beanstalk chat command
 minetest.register_chatcommand("go_beanstalk", {
-	params = "<lv> <b>",
+	params = "<lv>,<b>",
 	description = "go_beanstalk <lv>,<b>: teleport to beanstalk location",
 	func = function (name,param)
 		beanstalk.go_beanstalk(name,param)
