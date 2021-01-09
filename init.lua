@@ -2,12 +2,12 @@
 
 --brief explanation of what each of the beanstalk parameters do/mean
 --bnst[lv][b]  lv=what level of the world this beanstalk is on.  1=ordinary ground level.  if your world has more levels, 1=the first level above ground level, etc
---stemtot= total number of stems (vines) in this beanstalk. 
---stemrad= the radius of each stem.  
---rot1radius= this is the radius that the stems rotate around each other.  
---rot1dir= direction stems rotate around each other.  1=clockwise, -1=counter clockwise.  
+--stemtot= total number of stems (vines) in this beanstalk.
+--stemrad= the radius of each stem.
+--rot1radius= this is the radius that the stems rotate around each other.
+--rot1dir= direction stems rotate around each other.  1=clockwise, -1=counter clockwise.
 --rot1yper360= y units per one 360 degree rotation of a stem
---rot2radius= the radius of the secondary spiral.  this is the radius that the center the stems are rotating around rotates around. 
+--rot2radius= the radius of the secondary spiral.  this is the radius that the center the stems are rotating around rotates around.
 --rot2yper360= y units per one 360 degree rotation of the secondary spiral
 --rot2dir= direction the secondary spiral rotates.  1=clockwise, -1=counter clockwise
 --rot1crazy= this number is how much the rot1radius changes.  if rot1crazy=3 then rot1radius will vary by -3 to +3
@@ -40,7 +40,7 @@ local bnst={}
 local bnst_values={}
 
 -- reuse the same massive VoxelManip memory buffer instead of creating on every on_generate()
-local vm_data = {} 
+local vm_data = {}
 
 
 --this function displays the entire bnst_values table in the log
@@ -59,28 +59,28 @@ function beanstalk.displaybv()
 		else
 			local r=1
 			--minetest.log("  in ktag bnst_values[klv].count.chancefrm.1="..bnst_values[klv].count.chancefrm[r])
---      for ktag,vtag in ipairs(bnst_values[klv]) do 
-			for ktag,vtag in pairs(vlv) do       
-				--minetest.log("ktag="..ktag.." type(vtag)="..type(vtag)) 
+--      for ktag,vtag in ipairs(bnst_values[klv]) do
+			for ktag,vtag in pairs(vlv) do
+				--minetest.log("ktag="..ktag.." type(vtag)="..type(vtag))
 				if type(vtag)~="table" then
 					minetest.log("beanstalk-> bnst_values["..klv.."]."..ktag.."="..vtag)
-				else 
+				else
 					--minetest.log("    in kfld")
 					for kfld,vfld in pairs(bnst_values[klv][ktag]) do
-						--minetest.log("kfld="..kfld.." type(vfld)="..type(vfld)) 
+						--minetest.log("kfld="..kfld.." type(vfld)="..type(vfld))
 						if type(vfld)~="table" then
 							minetest.log("beanstalk-> bnst_values["..klv.."]["..ktag.."]."..kfld.."="..vfld)
 						else
 							--minetest.log("  in krow")
-							for krow,vrow in pairs(bnst_values[klv][ktag][kfld]) do              
-									minetest.log("beanstalk-> bnst_values["..klv.."]["..ktag.."]["..kfld.."]["..krow.."]="..vrow)              
+							for krow,vrow in pairs(bnst_values[klv][ktag][kfld]) do
+									minetest.log("beanstalk-> bnst_values["..klv.."]["..ktag.."]["..kfld.."]["..krow.."]="..vrow)
 							end --for krow
 						end --if kfld not table
 					end --for kfld
 				end --if ktag not table
 			end --for ktag
-		end --if klv not table 
-	end --for klv   
+		end --if klv not table
+	end --for klv
 	minetest.log("beanstalk-> ==end==")
 	minetest.log("beanstalk-> ")
 end --displaybv
@@ -93,9 +93,9 @@ end --displaybv
 function beanstalk.copy_prev_bnst_values(lv)
 	local plv=lv-1
 	for k,v in pairs(bnst_values[plv]) do  --loop through everything (tags and base level vars) in previous level
-		if bnst_values[lv][k]==nil then 
-			bnst_values[lv][k]=bnst_values[plv][k] 
-			--minetest.log("beanstalk-> copy prev value k="..k)      
+		if bnst_values[lv][k]==nil then
+			bnst_values[lv][k]=bnst_values[plv][k]
+			--minetest.log("beanstalk-> copy prev value k="..k)
 			end --if this level is unpopulated, copy previous level
 	end --for
 end --copy_prev_beanstalk_values
@@ -109,9 +109,9 @@ end --copy_prev_beanstalk_values
 --the lua code.  This also means that you could update the code without loosing your customized
 --settings
 --IMPORTANT NOTE: the beanstalk_values file is ONLY read when a beanstalks file does not already exist
---this means that the very first time you start a new world with beanstalks, the beanstalk_values file 
---will be read, and all of the beanstalks will be created using those values.  After that, the 
---beanstalks are loaded from the beanstalks file and this file will not be used again until you 
+--this means that the very first time you start a new world with beanstalks, the beanstalk_values file
+--will be read, and all of the beanstalks will be created using those values.  After that, the
+--beanstalks are loaded from the beanstalks file and this file will not be used again until you
 --create a new world
 --
 --this function loads the beanstalk values (the user defined formulas for creating beanstalks)
@@ -131,29 +131,29 @@ function beanstalk.read_beanstalk_values()
 	bnst_values={}
 	bnst_values.level_max=0
 		minetest.log("beanstalk-> file worldpth="..minetest.get_worldpath().."/beanstalk_values.conf")
-		minetest.log("beanstalk-> file modpath="..minetest.get_modpath("beanstalk").."/beanstalk_values.conf")  
+		minetest.log("beanstalk-> file modpath="..minetest.get_modpath("beanstalk").."/beanstalk_values.conf")
 	--first we look to see if there is a beanstalks_values file in the world path
 	local file = io.open(minetest.get_worldpath().."/beanstalk_values.conf", "r")
 	--if its not in the worldpath, try for the modpath
 	if file then
 		minetest.log("beanstalk-> loading beanstalk_values from worldpath:")
-	else  
-		file = io.open(minetest.get_modpath("beanstalk").."/beanstalk_values.conf", "r")    
-		if file then minetest.log("info", "beanstalk-> loading beanstalk_values from modpath") 
+	else
+		file = io.open(minetest.get_modpath("beanstalk").."/beanstalk_values.conf", "r")
+		if file then minetest.log("info", "beanstalk-> loading beanstalk_values from modpath")
 		else minetest.log("error", "beanstalk-> unable to find beanstalk_values file in worldpath or modpath.  This is bad")
 		end --if file (modpath)
-	end --if file (worldpath)   
-	if file then  
+	end --if file (worldpath)
+	if file then
 		for line in file:lines() do
 			str = line
 			minetest.log("verbose", "beanstalk-> str:"..str)
 			--eliminate comments
 			p=string.find(str,"%-%-")  -- because hyphen is a magic character in lua you have to escape it, this searches for --
-			if p~=nil then str=string.sub(str,1,p-1) end              
+			if p~=nil then str=string.sub(str,1,p-1) end
 			--split based on =, every line with data has an = in it
 			p=string.find(str,"=")
 			if p~=nil then --equals : now we know we have an actual entry
-				--split beanstalk_level=0 into tag=beanstalk_level value=0  
+				--split beanstalk_level=0 into tag=beanstalk_level value=0
 				--split stemrad =75:2,6 into tag=stemrad value=75:2,6
 				tag=luautils.trim(string.sub(str,1,p-1)) --tag is everything to the left of the =
 				value=luautils.trim(string.sub(str,p+1)) --value is everything to the right of the =
@@ -164,97 +164,100 @@ function beanstalk.read_beanstalk_values()
 					--I should probably add level checking to make certain they are doing these in order
 					--I don't think I want to remove the level number from the values file
 					if lv>bnst_values.level_max then bnst_values.level_max=lv end
-					bnst_values[lv]={}               
+					bnst_values[lv]={}
 					--minetest.log("beanstalk->   created new lv="..lv)
 					if lv>2 then --check back values
 						--if the user does not set a value in a level, then take the value from the previous level
 						beanstalk.copy_prev_bnst_values(lv-1)
 					end --if
-					minetest.log("verbose", "beanstalk->   lv="..lv.." (new level)")                  
-				else --tag but not beanstalk_level: process this line as a new entry for this beanstalk level             
+					minetest.log("verbose", "beanstalk->   lv="..lv.." (new level)")
+				else --tag but not beanstalk_level: process this line as a new entry for this beanstalk level
+					local bnst_values_lv = bnst_values[lv]
 					if tag~="" then --this is a new tag, not a blank continuation
 						r=1 --new tag, first row
 						--minetest.log("beanstalk->   lv="..lv.." new tag="..tag.." r="..r)
-						--we have a new tag value zero out the rndval table vars  
-						bnst_values[lv][tag]={}                              
-						bnst_values[lv][tag].chancemax=1  --chancemax is what is the maximum random number we need to roll on the chance table of values, default=1
-						bnst_values[lv][tag].rowmax=r
-						--now initialize [tag]for these items so we can use as a multi-dimensional array [tag][r] 
-						bnst_values[lv][tag].chancefrm={}
-						bnst_values[lv][tag].chanceto={}
-						bnst_values[lv][tag].valfrm={}
-						bnst_values[lv][tag].valto={}            
-						bnst_values[lv][tag].chancefrm[r]=1 --first entry in table always starts from 1 
-						bnst_values[lv][tag].chanceto[r]=1  --will be changed later probably
+						--we have a new tag value zero out the rndval table vars
+						bnst_values_lv[tag]={}
+						local bnst_values_lv_tag = bnst_values_lv[tag] -- keep a reference to the tag's table since tag won't change after this line
+						bnst_values_lv_tag.chancemax=1  --chancemax is what is the maximum random number we need to roll on the chance table of values, default=1
+						bnst_values_lv_tag.rowmax=r
+						--now initialize [tag]for these items so we can use as a multi-dimensional array [tag][r]
+						bnst_values_lv_tag.chancefrm={}
+						bnst_values_lv_tag.chanceto={}
+						bnst_values_lv_tag.valfrm={}
+						bnst_values_lv_tag.valto={}
+						bnst_values_lv_tag.chancefrm[r]=1 --first entry in table always starts from 1
+						bnst_values_lv_tag.chanceto[r]=1  --will be changed later probably
 						prevtag=tag
-					else --tag=""   blank tags are continuations of the previous tag 
-						tag=prevtag      
+					else --tag=""   blank tags are continuations of the previous tag
+						tag=prevtag
+						local bnst_values_lv_tag = bnst_values_lv[tag] -- keep a reference to the tag's table since tag won't change after this line
 						r=r+1
-						--minetest.log("beanstalk->   lv="..lv.." continued tag="..tag.." r="..r)            
-						bnst_values[lv][tag].rowmax=r
-						--local oldchanceto=bnst_values[lv][tag].chanceto[r-1]
-						--bnst_values[lv][tag].chancefrm[r]=oldchanceto+1 
-						bnst_values[lv][tag].chancefrm[r]=bnst_values[lv][tag].chanceto[r-1]+1
-						bnst_values[lv][tag].chanceto[r]=bnst_values[lv][tag].chancefrm[r] --will be changed later probably
-						--minetest.log("beanstalk->   lv="..lv.." continued tag="..tag.." r="..r.." chancefrm="..bnst_values[lv][tag].chancefrm[r])            
+						--minetest.log("beanstalk->   lv="..lv.." continued tag="..tag.." r="..r)
+						bnst_values_lv_tag.rowmax=r
+						--local oldchanceto=bnst_values_lv_tag.chanceto[r-1]
+						--bnst_values_lv_tag.chancefrm[r]=oldchanceto+1
+						bnst_values_lv_tag.chancefrm[r]=bnst_values_lv_tag.chanceto[r-1]+1
+						bnst_values_lv_tag.chanceto[r]=bnst_values_lv_tag.chancefrm[r] --will be changed later probably
+						--minetest.log("beanstalk->   lv="..lv.." continued tag="..tag.." r="..r.." chancefrm="..bnst_values_lv_tag.chancefrm[r])
 						--for any row past the first, chancefrom is one greater than the previous chanceto
-						--remember chancefrm chanceto and chancemax are about the chance table values, the chance that we will use this rows valfrm and valto to get results 
-					end --if tag~=""                                                  
+						--remember chancefrm chanceto and chancemax are about the chance table values, the chance that we will use this rows valfrm and valto to get results
+					end --if tag~=""
 					
 					--now check to see if this is a simple entry with one value, like vnode=bnst_vine1, or a complex entry with ranges like rot1yper360=3:1;80
-					local pbar=string.find(value,"|")  --find the vert bar                       
-					if pbar==nil then --we have a simple tag with just one value like vnode=bnst_vine1, or a single row with a range, like stemtot=3;5. fake a row for it          
+					local pbar=string.find(value,"|")  --find the vert bar
+					if pbar==nil then --we have a simple tag with just one value like vnode=bnst_vine1, or a single row with a range, like stemtot=3;5. fake a row for it
 						if r>1 then
 							minetest.log("error", "beanstalk-> ERROR:"..str)
 							minetest.log("error", "beanstalk->  lv="..lv.." tag="..tag.." r="..r.." ERROR! should never have an entry with blank tag and no bar!")
 						else --r==1
 							--minetest.log("beanstalk-> simple entry, no bar, value="..value);
 							--no chance table, so we make one up just to make this work the same as all the others  example: snode=bnst_stalk1
-							--bnst_values[lv][tag].chanceto[r]=bnst_values[lv][tag].chancefrm[r]  --it is already set this way as default isnt it?
+							--bnst_values_lv[tag].chanceto[r]=bnst_values_lv[tag].chancefrm[r]  --it is already set this way as default isnt it?
 							local psemicol=string.find(value,";")
 							if psemicol~=nil then --semicol
-								bnst_values[lv][tag].valfrm[r]=luautils.trim(string.sub(value,1,psemicol-1))
-								bnst_values[lv][tag].valto[r]=luautils.trim(string.sub(value,psemicol+1))
+								bnst_values_lv[tag].valfrm[r]=luautils.trim(string.sub(value,1,psemicol-1))
+								bnst_values_lv[tag].valto[r]=luautils.trim(string.sub(value,psemicol+1))
 							else --no semicol, only one value
-								bnst_values[lv][tag].valfrm[r]=value
-								bnst_values[lv][tag].valto[r]=value
+								bnst_values_lv[tag].valfrm[r]=value
+								bnst_values_lv[tag].valto[r]=value
 							end --semicol							
 						end --r>1
 					else --pbar found
-						--so we have a value in the form of 75|2;6 or 2|1  
-						--the number before the bar is the chance.  
+						--so we have a value in the form of 75|2;6 or 2|1
+						--the number before the bar is the chance.
 						--the numbers after the bar are the actual beanstalk from and to values for this entry (to is optional)
 						local chance=luautils.trim(string.sub(value,1,pbar-1)) --to the left of the :
-						--chancefrom and chanceto are used to pick which row we will get the values from          
-						local valfromto=luautils.trim(string.sub(value,pbar+1))  --to the right of the :        
-						--minetest.log("beanstalk->       chance="..chance.." valfromto="..valfromto)  
+						--chancefrom and chanceto are used to pick which row we will get the values from
+						local valfromto=luautils.trim(string.sub(value,pbar+1))  --to the right of the :
+						--minetest.log("beanstalk->       chance="..chance.." valfromto="..valfromto)
 						--valfrom and valto are the actual range of values we will roll from to pick the final beanstalk value
 						--if chancefrom=1 and chance=5 then chanceto=5
 						--if chancefrom=6 and chance=3 then chanceto=8
 						--chance tells us what the range is for this row entry
-						bnst_values[lv][tag].chanceto[r]=bnst_values[lv][tag].chancefrm[r]+chance-1
+						bnst_values_lv[tag].chanceto[r]=bnst_values_lv[tag].chancefrm[r]+chance-1
 						--chancemax tells us the maximum chance we have to roll on the chance values table.
 						--could update this from the last row when we are done instead of updating it as we go.  But this works.
-						bnst_values[lv][tag].chancemax=bnst_values[lv][tag].chanceto[r] 
+						bnst_values_lv[tag].chancemax=bnst_values_lv[tag].chanceto[r]
 
 						--we use semicolon instead of comma so that you can use math with a colon in it in your definitions (like math.random(from,to))
 						local psemicol=string.find(valfromto,";")
 						if psemicol~=nil then --semicol
-							bnst_values[lv][tag].valfrm[r]=luautils.trim(string.sub(valfromto,1,psemicol-1))
-							bnst_values[lv][tag].valto[r]=luautils.trim(string.sub(valfromto,psemicol+1))
+							bnst_values_lv[tag].valfrm[r]=luautils.trim(string.sub(valfromto,1,psemicol-1))
+							bnst_values_lv[tag].valto[r]=luautils.trim(string.sub(valfromto,psemicol+1))
 						else --no semicol, only one value
-							bnst_values[lv][tag].valfrm[r]=valfromto
-							bnst_values[lv][tag].valto[r]=valfromto
+							bnst_values_lv[tag].valfrm[r]=valfromto
+							bnst_values_lv[tag].valto[r]=valfromto
 						end --semicol
 					end --bar
-				minetest.log("verbose", "beanstalk->   lv="..lv.." tag="..tag.." r="..r.." chancefrm="..bnst_values[lv][tag].chancefrm[r]..
-						" chanceto="..bnst_values[lv][tag].chanceto[r].." valfrm="..bnst_values[lv][tag].valfrm[r].." valto="..bnst_values[lv][tag].valto[r])
-				minetest.log("verbose", "beanstalk->      chancemax="..bnst_values[lv][tag].chancemax.." rowmax="..bnst_values[lv][tag].rowmax)                  
-				end --if tag="beanstalk_level"  
-			end --equals    
+				minetest.log("verbose", "beanstalk->   lv="..lv.." tag="..tag.." r="..r.." chancefrm="..bnst_values_lv[tag].chancefrm[r]..
+						" chanceto="..bnst_values_lv[tag].chanceto[r].." valfrm="..bnst_values_lv[tag].valfrm[r].." valto="..bnst_values_lv[tag].valto[r])
+				minetest.log("verbose", "beanstalk->      chancemax="..bnst_values_lv[tag].chancemax.." rowmax="..bnst_values_lv[tag].rowmax)
+				end --if tag="beanstalk_level"
+			end --equals
 		end -- for line in file:lines() do
 	if lv>1 then beanstalk.copy_prev_bnst_values(bnst_values.level_max) end  --got to copy previous values for the last one
-	end --if file 
+	end --if file
 	minetest.log("verbose", "beanstalk-> beanstalk_values loaded bnst_values.level_max="..bnst_values.level_max)
 	beanstalk.displaybv()
 end --read_beanstalk_values
@@ -267,30 +270,30 @@ end --read_beanstalk_values
 --so, for example 1.0382452725245+e14 will become 54252725428301
 function beanstalk.seednum(numin)
 	--local rslt=string.gsub(string.gsub(string.gsub(numin,"%.",""),"e",""),"+","")  --eliminate . e and +
-	local rslt=string.gsub(string.gsub(numin,"%.",""),"-","") --remove the decimal point and any negative sign  
+	local rslt=string.gsub(string.gsub(numin,"%.",""),"-","") --remove the decimal point and any negative sign
 	--rslt=rslt:match("(%d+)e.*")  --remove scientific notation   my regex doesn't work, so doing this the old fasioned way
 	local p=string.find(rslt,"e")
 	if p~=nil then rslt=string.sub(rslt,1,p-1) end  --strip off the scientific notation
-	rslt=rslt:match("0*(%d+)")   --strip leading zeros 
+	rslt=rslt:match("0*(%d+)")   --strip leading zeros
 	rslt=string.reverse(rslt):match("0*(%d+)")  --reverse and strip leading zeros again
 	--now make certain it is 14 long.
 	repeat
-		rslt=string.sub(rslt..string.reverse(rslt),1,14) 
+		rslt=string.sub(rslt..string.reverse(rslt),1,14)
 	until string.len(rslt)==14
 	--minetest.log("stripnum numin="..numin.." rslt="..rslt)
 	return tonumber(rslt)
-end  
+end
 
 
 --this is used to retrieve beanstalk values.  It rolls random results from bnst_values table
 --pass b=0 when calling for values in bnst[lv]
 --********************************
-function beanstalk.get_bval(lv,b,tag)  
+function beanstalk.get_bval(lv,b,tag)
 	--minetest.log("beanstalk-> bval: lv="..lv.." b="..b.." tag="..tag)
 	--get a random seed
 	local lvseed=beanstalk.seednum(math.sin(lv))
 	--minetest.log("beanstalk-> bval: b="..b)
-	--minetest.log("beanstalk-> bval: math.tan(b)="..math.tan(b)) 
+	--minetest.log("beanstalk-> bval: math.tan(b)="..math.tan(b))
 	local _,bseed=math.modf(math.tan(b))
 	--minetest.log("beanstalk-> bval: modf(b)="..bseed)
 	bseed=beanstalk.seednum(bseed)
@@ -298,7 +301,7 @@ function beanstalk.get_bval(lv,b,tag)
 	local tagseed=1
 	for i=1,string.len(tag),1 do
 		tagseed=beanstalk.seednum(tagseed*string.byte(tag,i)+beanstalk.seednum(math.cos(string.byte(tag,i))))
-	end --for 
+	end --for
 
 	local seed=beanstalk.seednum(bnst.seed+lvseed+bseed+tagseed)
 
@@ -314,54 +317,56 @@ function beanstalk.get_bval(lv,b,tag)
 	--minetest.log("beanstalk-> bval: lvseed   ="..lvseed)
 	--minetest.log("beanstalk-> bval: bseed    ="..bseed)
 	--minetest.log("beanstalk-> bval: tagseed  ="..tagseed)
-	--minetest.log("beanstalk-> bval: seed     ="..seed)  
- 
-	if not bnst_values[lv][tag] then
+	--minetest.log("beanstalk-> bval: seed     ="..seed)
+
+	local bnst_values_lv_tag = bnst_values[lv][tag] -- cache reference to bnst_values[lv][tag] since neither lv nor tag change after this line
+	if not bnst_values_lv_tag then
 		return -- tag not found
 	end
- 
-	local rnd=math.random(1,bnst_values[lv][tag].chancemax)   
+
+	local rnd=math.random(1,bnst_values_lv_tag.chancemax)
 	local r=1
- -- minetest.log("beanstalk-> rowmax="..bnst_values[lv][tag].rowmax)
+ -- minetest.log("beanstalk-> rowmax="..bnst_values_lv_tag.rowmax)
  -- minetest.log("beanstalk-> chancefrm="
-	while r<=bnst_values[lv][tag].rowmax and rnd>bnst_values[lv][tag].chanceto[r] do      
+	while r<=bnst_values_lv_tag.rowmax and rnd>bnst_values_lv_tag.chanceto[r] do
 		r=r+1
 	end--while
 	--minetest.log("beanstalk-> bval: r="..r)
 	--I'm not going to waste time checking if r<=varin.maxrows because that shouldn't be possible
 	--may change my mind on that later.
 	local rslt=""
-	local valfrm=bnst_values[lv][tag].valfrm[r]
-	local valto=bnst_values[lv][tag].valto[r]
-	--minetest.log("beanstalk-> bval: before variable substitution valfrm="..valfrm.." valto="..valto)  
+	local valfrm=bnst_values_lv_tag.valfrm[r]
+	local valto=bnst_values_lv_tag.valto[r]
+	--minetest.log("beanstalk-> bval: before variable substitution valfrm="..valfrm.." valto="..valto)
 	
-	--these are the variables that can be substituted     
+	--these are the variables that can be substituted
 	local vars={}
-	if b>0 then   
+	if b>0 then
+		local bnst_lv_b = bnst[lv][b] -- cache reference to bnst[lv][b] since neither lv nor b change after this line
 		--easy to add other variables to this list if we need them later
-		vars={stemtot=luautils.var_or_nil(bnst[lv][b].stemtot), 
-					stemradius=luautils.var_or_nil(bnst[lv][b].stemradius),
-					rot1dir=luautils.var_or_nil(bnst[lv][b].rot1dir),               
-					rot1radius=luautils.var_or_nil(bnst[lv][b].rot1radius), 
-					rot1circumf=luautils.var_or_nil(bnst[lv][b].rot1circumf), 
-					rot1yper360=luautils.var_or_nil(bnst[lv][b].rot1yper360), 
-					rot1crazy=luautils.var_or_nil(bnst[lv][b].rot1crazy),
-					rot2dir=luautils.var_or_nil(bnst[lv][b].rot2dir),                
-					rot2radius=luautils.var_or_nil(bnst[lv][b].rot2radius), 
-					rot2circumf=luautils.var_or_nil(bnst[lv][b].rot2circumf),               
-					rot2yper360=luautils.var_or_nil(bnst[lv][b].rot2yper360), 
-					rot2crazy=luautils.var_or_nil(bnst[lv][b].rot2crazy)} 
-	end --if b>0  
+		vars={stemtot=luautils.var_or_nil(bnst_lv_b.stemtot),
+					stemradius=luautils.var_or_nil(bnst_lv_b.stemradius),
+					rot1dir=luautils.var_or_nil(bnst_lv_b.rot1dir),
+					rot1radius=luautils.var_or_nil(bnst_lv_b.rot1radius),
+					rot1circumf=luautils.var_or_nil(bnst_lv_b.rot1circumf),
+					rot1yper360=luautils.var_or_nil(bnst_lv_b.rot1yper360),
+					rot1crazy=luautils.var_or_nil(bnst_lv_b.rot1crazy),
+					rot2dir=luautils.var_or_nil(bnst_lv_b.rot2dir),
+					rot2radius=luautils.var_or_nil(bnst_lv_b.rot2radius),
+					rot2circumf=luautils.var_or_nil(bnst_lv_b.rot2circumf),
+					rot2yper360=luautils.var_or_nil(bnst_lv_b.rot2yper360),
+					rot2crazy=luautils.var_or_nil(bnst_lv_b.rot2crazy)}
+	end --if b>0
 	local rslt
 	--only call string_math if tag is not one of our text tags
 	if tag~="snode" and tag~="vnode" and tag~="enforce_min_rot1rad" and tag~="rnode" and tag~="rvnode" then
 		valfrm=luautils.string_math(valfrm,vars)
 		valto=luautils.string_math(valto,vars)
-	end  
+	end
 	if valfrm==valto then rslt=valfrm
-	else --if valfrm is different from valto, then get a random number between valfrm and valto    
-		rslt=math.random(valfrm,valto)    
-	end--if 
+	else --if valfrm is different from valto, then get a random number between valfrm and valto
+		rslt=math.random(valfrm,valto)
+	end--if
 
 	return rslt
 end --get_bval
@@ -409,7 +414,7 @@ end --voxel_circum
 --********************************
 function beanstalk.calculated_constants_bylevel()
 	--calculated constants by level
-	bnst.level_max=bnst_values.level_max 
+	bnst.level_max=bnst_values.level_max
 	for lv=1,bnst.level_max do
 		--bnst[lv].seed=bnst.seed+(math.sin(lv)*100000000)  --this gives us a uniqe different seed for each level, used for crazy
 		if bnst[lv]==nil then bnst[lv]={} end --we run this more than once, dont want to wipe out values other times
@@ -455,25 +460,27 @@ function beanstalk.calculated_constants_bybnst()
 	minetest.log("verbose", "beanstalk-> calculated constants by beanstalk")
 	minetest.log("verbose", "beanstalk-> list --------------------------------------")
 	for lv=1,bnst.level_max do  --loop through the levels
-		minetest.log("verbose", "***beanstalk-> level="..lv.." ***")    
-		for b=1,bnst[lv].count do   --loop through the beanstalks
-			minetest.log("verbose", "beanstalk->   lv="..lv.." b="..b)     
-			bnst[lv][b].rot1min=bnst[lv][b].rot1radius --default if we dont set crazy
-			bnst[lv][b].rot1max=bnst[lv][b].rot1radius --default if we dont set crazy
-			bnst[lv][b].rot2min=bnst[lv][b].rot2radius --default if we dont set crazy
-			bnst[lv][b].rot2max=bnst[lv][b].rot2radius --default if we dont set crazy
+		local bnst_lv = bnst[lv] -- grab a reference to this level's beanstalk definition table
+		minetest.log("verbose", "***beanstalk-> level="..lv.." ***")
+		for b=1,bnst_lv.count do   --loop through the beanstalks
+			local bnst_lv_b = bnst_lv[b] -- grab a reference to the specific beanstalk
+			minetest.log("verbose", "beanstalk->   lv="..lv.." b="..b)
+			bnst_lv_b.rot1min=bnst_lv_b.rot1radius --default if we dont set crazy
+			bnst_lv_b.rot1max=bnst_lv_b.rot1radius --default if we dont set crazy
+			bnst_lv_b.rot2min=bnst_lv_b.rot2radius --default if we dont set crazy
+			bnst_lv_b.rot2max=bnst_lv_b.rot2radius --default if we dont set crazy
 
-			if bnst[lv][b].rot1crazy>0 then
+			if bnst_lv_b.rot1crazy>0 then
 				--determine the min and max we will move the rot1radius through
-				bnst[lv][b].rot1max=bnst[lv][b].rot1radius+bnst[lv][b].rot1crazy
-				bnst[lv][b].rot1min=bnst[lv][b].rot1radius-bnst[lv][b].rot1crazy
-				if bnst[lv][b].rot1min<bnst[lv][b].stemradius then --we dont want min to be too small
+				bnst_lv_b.rot1max=bnst_lv_b.rot1radius+bnst_lv_b.rot1crazy
+				bnst_lv_b.rot1min=bnst_lv_b.rot1radius-bnst_lv_b.rot1crazy
+				if bnst_lv_b.rot1min<bnst_lv_b.stemradius then --we dont want min to be too small
 					--below line says add what we take off the min to the max
-					bnst[lv][b].rot1max=bnst[lv][b].rot1max+(bnst[lv][b].stemradius-bnst[lv][b].rot1min)
-					bnst[lv][b].rot1min=bnst[lv][b].stemradius
+					bnst_lv_b.rot1max=bnst_lv_b.rot1max+(bnst_lv_b.stemradius-bnst_lv_b.rot1min)
+					bnst_lv_b.rot1min=bnst_lv_b.stemradius
 				end --if rot1min<stemradius
 			end --if rot1crazy>0
-			bnst[lv][b].noise1=nil
+			bnst_lv_b.noise1=nil
 			--now, right here would be a GREAT place to create and store the perlin noise.
 			--BUT, you cant do that at this point, because the map isn't generated.  and for some odd reason,
 			--the perlin noise function exits as nil if you use it before map generation.  so we will do it
@@ -481,35 +488,35 @@ function beanstalk.calculated_constants_bybnst()
 			--perlin noise is random, but SMOOTH, so it makes interesting looking changes.
 			--we need to play with the perlin noise values and see if we can get results we like better
 
-			if bnst[lv][b].rot2crazy>0 then
+			if bnst_lv_b.rot2crazy>0 then
 				--determine the min and max we will move the rot2radius through
-				bnst[lv][b].rot2max=bnst[lv][b].rot2radius+bnst[lv][b].rot2crazy
-				bnst[lv][b].rot2min=bnst[lv][b].rot2radius-bnst[lv][b].rot2crazy
-				if bnst[lv][b].rot2min<0 then --we dont want min to be too small
+				bnst_lv_b.rot2max=bnst_lv_b.rot2radius+bnst_lv_b.rot2crazy
+				bnst_lv_b.rot2min=bnst_lv_b.rot2radius-bnst_lv_b.rot2crazy
+				if bnst_lv_b.rot2min<0 then --we dont want min to be too small
 					--below line says add what we take off the min to the max
-					bnst[lv][b].rot2max=bnst[lv][b].rot2max+math.abs(bnst[lv][b].rot2min)
-					bnst[lv][b].rot2min=0
+					bnst_lv_b.rot2max=bnst_lv_b.rot2max+math.abs(bnst_lv_b.rot2min)
+					bnst_lv_b.rot2min=0
 				end --if rot2min<0
 			end --if rot2crazy>0
-			bnst[lv][b].noise2=nil
+			bnst_lv_b.noise2=nil
 
 			-- total radius = rot1radius (radius stems circle around) + stem radius + 2 more for a space around the beanstalk (will be air)
 			-- so this is the total radius around the current center
-			bnst[lv][b].totradius=bnst[lv][b].rot1max+bnst[lv][b].stemradius+2
+			bnst_lv_b.totradius=bnst_lv_b.rot1max+bnst_lv_b.stemradius+2
 			-- but totradius can not be used for determining min and maxp, because the current center moves! for that we need
 			-- full radius = max diameter of entire beanstalk including outer spiral (rot2radius)
-			bnst[lv][b].fullradius=bnst[lv][b].totradius+bnst[lv][b].rot2max
-			bnst[lv][b].minp={x=bnst[lv][b].pos.x-bnst[lv][b].fullradius, y=bnst[lv][b].pos.y, z=bnst[lv][b].pos.z-bnst[lv][b].fullradius}
-			bnst[lv][b].maxp={x=bnst[lv][b].pos.x+bnst[lv][b].fullradius, y=bnst[lv].top, z=bnst[lv][b].pos.z+bnst[lv][b].fullradius}
+			bnst_lv_b.fullradius=bnst_lv_b.totradius+bnst_lv_b.rot2max
+			bnst_lv_b.minp={x=bnst_lv_b.pos.x-bnst_lv_b.fullradius, y=bnst_lv_b.pos.y, z=bnst_lv_b.pos.z-bnst_lv_b.fullradius}
+			bnst_lv_b.maxp={x=bnst_lv_b.pos.x+bnst_lv_b.fullradius, y=bnst_lv.top, z=bnst_lv_b.pos.z+bnst_lv_b.fullradius}
 
 			--display it
-			local logstr="bnst["..lv.."]["..b.."] "..minetest.pos_to_string(bnst[lv][b].pos)
-			logstr=logstr.." stemtot="..bnst[lv][b].stemtot.." stemrad="..bnst[lv][b].stemradius
-			logstr=logstr.." rot1dir="..bnst[lv][b].rot1dir.." rot1radius="..bnst[lv][b].rot1radius.." rot1yper360="..bnst[lv][b].rot1yper360
-			logstr=logstr.." rot1crazy="..bnst[lv][b].rot1crazy      
-			logstr=logstr.." rot2dir="..bnst[lv][b].rot2dir.." rot2radius="..bnst[lv][b].rot2radius.." rot2yper360="..bnst[lv][b].rot2yper360
-			logstr=logstr.." rot2crazy="..bnst[lv][b].rot2crazy
-			bnst[lv][b].desc=logstr
+			local logstr="bnst["..lv.."]["..b.."] "..minetest.pos_to_string(bnst_lv_b.pos)
+			logstr=logstr.." stemtot="..bnst_lv_b.stemtot.." stemrad="..bnst_lv_b.stemradius
+			logstr=logstr.." rot1dir="..bnst_lv_b.rot1dir.." rot1radius="..bnst_lv_b.rot1radius.." rot1yper360="..bnst_lv_b.rot1yper360
+			logstr=logstr.." rot1crazy="..bnst_lv_b.rot1crazy
+			logstr=logstr.." rot2dir="..bnst_lv_b.rot2dir.." rot2radius="..bnst_lv_b.rot2radius.." rot2yper360="..bnst_lv_b.rot2yper360
+			logstr=logstr.." rot2crazy="..bnst_lv_b.rot2crazy
+			bnst_lv_b.desc=logstr
 			minetest.log("verbose", logstr)
 		end --for b
 	end --for lv
@@ -530,21 +537,23 @@ function beanstalk.write_beanstalks()
 	if file then
 		--wipe out variables that we will recalculate
 		for lv=1,bnst.level_max do  --loop through the levels
-			bnst[lv].per_row=nil
-			bnst[lv].area=nil
-			bnst[lv].top=nil
-			for b=1,bnst[lv].count do   --loop through the beanstalks
-				bnst[lv][b].rot1min=nil
-				bnst[lv][b].rot1max=nil
-				bnst[lv][b].rot1circumf=nil
-				bnst[lv][b].rot2min=nil
-				bnst[lv][b].rot2max=nil
-				bnst[lv][b].rot2circumf=nil
-				bnst[lv][b].totradius=nil
-				bnst[lv][b].fullradius=nil
-				bnst[lv][b].minp=nil
-				bnst[lv][b].maxp=nil
-				bnst[lv][b].desc=nil
+			local bnst_lv = bnst[lv]
+			bnst_lv.per_row=nil
+			bnst_lv.area=nil
+			bnst_lv.top=nil
+			for b=1,bnst_lv.count do   --loop through the beanstalks
+				local bnst_lv_b = bnst_lv[b]
+				bnst_lv_b.rot1min=nil
+				bnst_lv_b.rot1max=nil
+				bnst_lv_b.rot1circumf=nil
+				bnst_lv_b.rot2min=nil
+				bnst_lv_b.rot2max=nil
+				bnst_lv_b.rot2circumf=nil
+				bnst_lv_b.totradius=nil
+				bnst_lv_b.fullradius=nil
+				bnst_lv_b.minp=nil
+				bnst_lv_b.maxp=nil
+				bnst_lv_b.desc=nil
 			end --for b
 			--bnst[lv].max=nil
 		end --for lv
@@ -601,18 +610,19 @@ function beanstalk.create_beanstalks()
 	for lv=1,bnst.level_max do  --loop through the levels
 
 		for b=1,bnst[lv].count do   --loop through the beanstalks
-			bnst[lv][b]={ }
-			--bnst[lv][b].seed=mapseed+lv*10000+b  
+			bnst[lv][b]={}
+			local bnst_lv_b = bnst[lv][b] -- cache bnst[lv][b] reference since neither lv nor b changes from this point downward
+			--bnst_lv_b.seed=mapseed+lv*10000+b
 			--this gives us a unique seed for each beanstalk, used for perlin noise for crazy
-			bnst[lv][b].seed=mapseed+beanstalk.seednum(math.cos(lv))+beanstalk.seednum(math.sin(b))
+			bnst_lv_b.seed=mapseed+beanstalk.seednum(math.cos(lv))+beanstalk.seednum(math.sin(b))
 
 			--note that our random position is always at least 500 from the border, so that beanstalks can NEVER be right next to each other
 			local overlap=false
 			repeat
-				bnst[lv][b].pos={ }
-				bnst[lv][b].pos.x=math.floor(-31000 + (bnst[lv].area * (b % bnst[lv].per_row) + 500+math.random(0,bnst[lv].area-1000) ))
-				bnst[lv][b].pos.y=math.floor(bnst[lv].bot)  --floor just in case the user put some crazy fraction in here
-				bnst[lv][b].pos.z=math.floor(-31000 + (bnst[lv].area * (math.floor(b/bnst[lv].per_row) % bnst[lv].per_row) + 500 + math.random(0,bnst[lv].area-1000) ))
+				bnst_lv_b.pos={ }
+				bnst_lv_b.pos.x=math.floor(-31000 + (bnst[lv].area * (b % bnst[lv].per_row) + 500+math.random(0,bnst[lv].area-1000) ))
+				bnst_lv_b.pos.y=math.floor(bnst[lv].bot)  --floor just in case the user put some crazy fraction in here
+				bnst_lv_b.pos.z=math.floor(-31000 + (bnst[lv].area * (math.floor(b/bnst[lv].per_row) % bnst[lv].per_row) + 500 + math.random(0,bnst[lv].area-1000) ))
 								--now check to see if this beanstalk overlaps one below it.  the odds of this are tiny tiny tiny, but must be prevented anyway
 				if lv>1 then
 					local lvdn=lv-1
@@ -620,22 +630,23 @@ function beanstalk.create_beanstalks()
 					--note that when this runs, minp and maxp have not been calculated yet for any beanstalks!
 					--so we just make them up with a distance of 250 for each, guaranteeing a distance of 500 between beanstalks
 					local bnst1minp={ }
-					bnst1minp.x=bnst[lv][b].pos.x-250
-					bnst1minp.y=bnst[lv][b].pos.y
-					bnst1minp.z=bnst[lv][b].pos.z-250
+					bnst1minp.x=bnst_lv_b.pos.x-250
+					bnst1minp.y=bnst_lv_b.pos.y
+					bnst1minp.z=bnst_lv_b.pos.z-250
 					local bnst1maxp={ }
-					bnst1maxp.x=bnst[lv][b].pos.x+250
-					bnst1maxp.y=bnst[lv][b].pos.y
-					bnst1maxp.z=bnst[lv][b].pos.z+250
-					local bnst2minp={ }
-					bnst2minp.x=bnst[lvdn][bdn].pos.x-250
-					bnst2minp.y=bnst[lvdn][bdn].pos.y
-					bnst2minp.z=bnst[lvdn][bdn].pos.z-250
-					local bnst2maxp={ }
-					bnst2maxp.x=bnst[lvdn][bdn].pos.x+250
-					bnst2maxp.y=bnst[lvdn][bdn].pos.y
-					bnst2maxp.z=bnst[lvdn][bdn].pos.z+250
+					bnst1maxp.x=bnst_lv_b.pos.x+250
+					bnst1maxp.y=bnst_lv_b.pos.y
+					bnst1maxp.z=bnst_lv_b.pos.z+250
 					repeat
+						local bnst_lvdn_bdn = bnst[lvdn][bdn] -- cache this table reference
+						local bnst2minp={ }
+						bnst2minp.x=bnst_lvdn_bdn.pos.x-250
+						bnst2minp.y=bnst_lvdn_bdn.pos.y
+						bnst2minp.z=bnst_lvdn_bdn.pos.z-250
+						local bnst2maxp={ }
+						bnst2maxp.x=bnst_lvdn_bdn.pos.x+250
+						bnst2maxp.y=bnst_lvdn_bdn.pos.y
+						bnst2maxp.z=bnst_lvdn_bdn.pos.z+250
 						if luautils.check_overlap(bnst1minp,bnst1maxp,bnst2minp,bnst2maxp) then
 							overlap=true
 						end
@@ -645,64 +656,64 @@ function beanstalk.create_beanstalks()
 			until overlap==false
 
 			--stemtot = total number of stems
-			bnst[lv][b].stemtot=beanstalk.get_bval(lv,b,"stemtot")
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." stemtot="..bnst[lv][b].stemtot)
+			bnst_lv_b.stemtot=beanstalk.get_bval(lv,b,"stemtot")
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." stemtot="..bnst_lv_b.stemtot)
 			
 			--stemradius = radius of each stem
-			bnst[lv][b].stemradius=beanstalk.get_bval(lv,b,"stemradius")
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." stemradius="..bnst[lv][b].stemradius)      
+			bnst_lv_b.stemradius=beanstalk.get_bval(lv,b,"stemradius")
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." stemradius="..bnst_lv_b.stemradius)
 			
 			--rot1dir = direction of rotation of the inner spiral
-			bnst[lv][b].rot1dir=beanstalk.get_bval(lv,b,"rot1dir")
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot1dir="..bnst[lv][b].rot1dir)        
+			bnst_lv_b.rot1dir=beanstalk.get_bval(lv,b,"rot1dir")
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot1dir="..bnst_lv_b.rot1dir)
 
 			--rot1radius = the radius the stems rotate around
-			bnst[lv][b].rot1radius=beanstalk.get_bval(lv,b,"rot1radius")       
-			if string.upper(beanstalk.get_bval(lv,b,"enforce_min_rot1rad"))=="Y" then      
+			bnst_lv_b.rot1radius=beanstalk.get_bval(lv,b,"rot1radius")
+			if string.upper(beanstalk.get_bval(lv,b,"enforce_min_rot1rad"))=="Y" then
 				--stems merge too much if the rotation radius isn't at least stemradius
 				--and stem radius +1 looks better in my opinion
-				if bnst[lv][b].rot1radius<bnst[lv][b].stemradius then bnst[lv][b].rot1radius=bnst[lv][b].stemradius+1 
+				if bnst_lv_b.rot1radius<bnst_lv_b.stemradius then bnst_lv_b.rot1radius=bnst_lv_b.stemradius+1
 				end --if rot1radius<stemradius
 			end --if enforce_min_rot1rad
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot1radius="..bnst[lv][b].rot1radius)          
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot1radius="..bnst_lv_b.rot1radius)
 						
 			--rot1circumf = is usually used when determining yper360
-			bnst[lv][b].rot1circumf=beanstalk.voxel_circum(bnst[lv][b].rot1radius)  --used as a variable for setting yper360
+			bnst_lv_b.rot1circumf=beanstalk.voxel_circum(bnst_lv_b.rot1radius)  --used as a variable for setting yper360
 
 			--rot1yper360 = y units per one 360 degree rotation of a stem
-			bnst[lv][b].rot1yper360=math.floor(beanstalk.get_bval(lv,b,"rot1yper360"))
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot1yper360="..bnst[lv][b].rot1yper360)             
+			bnst_lv_b.rot1yper360=math.floor(beanstalk.get_bval(lv,b,"rot1yper360"))
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot1yper360="..bnst_lv_b.rot1yper360)
 
 			--rot1crazy = how much rot1radius varies
 			--crazy gives us a number, the biger the number, the bigger the range of change in the crazy stem rot1radius value
 			--note that this is the number we change each way, so crazy=3 means from radius-3 to radius+3
 			--and crazy=6 is a whopping TWELVE change in radius, that should be VERY noticible
 			--in calculated_constants_bybnst we use rot1crazy to set rot1min and rot1max
-			bnst[lv][b].rot1crazy=beanstalk.get_bval(lv,b,"rot1crazy")    
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot1crazy="..bnst[lv][b].rot1crazy)     
+			bnst_lv_b.rot1crazy=beanstalk.get_bval(lv,b,"rot1crazy")
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot1crazy="..bnst_lv_b.rot1crazy)
 
 			--rot2dir = direction of rotation of the outer spiral
-			bnst[lv][b].rot2dir=beanstalk.get_bval(lv,b,"rot2dir")    
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot2dir="..bnst[lv][b].rot2dir)         
+			bnst_lv_b.rot2dir=beanstalk.get_bval(lv,b,"rot2dir")
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot2dir="..bnst_lv_b.rot2dir)
 			
 			--rot2radius = radius of the secondary spiral
-			bnst[lv][b].rot2radius=beanstalk.get_bval(lv,b,"rot2radius")    
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot2radius="..bnst[lv][b].rot2radius)       
+			bnst_lv_b.rot2radius=beanstalk.get_bval(lv,b,"rot2radius")
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot2radius="..bnst_lv_b.rot2radius)
 
-		 --rot2circumf is usually used when determining yper360      
-			bnst[lv][b].rot2circumf=beanstalk.voxel_circum(bnst[lv][b].rot2radius)  --used as a variable for setting yper360
+		 --rot2circumf is usually used when determining yper360
+			bnst_lv_b.rot2circumf=beanstalk.voxel_circum(bnst_lv_b.rot2radius)  --used as a variable for setting yper360
 
 			--rot2yper360 = y units per one 365 degree rotation of secondary spiral
-			bnst[lv][b].rot2yper360=math.floor(beanstalk.get_bval(lv,b,"rot2yper360"))
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot2yper360="..bnst[lv][b].rot2yper360)         
---      if math.random(1,4)<4 then bnst[lv][b].rot2yper360=math.floor(math.random(bnst[lv][b].rot2circumf,100))
---      else bnst[lv][b].rot2yper360=math.floor(math.random(bnst[lv][b].rot2circumf*0.75,500))
+			bnst_lv_b.rot2yper360=math.floor(beanstalk.get_bval(lv,b,"rot2yper360"))
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot2yper360="..bnst_lv_b.rot2yper360)
+--      if math.random(1,4)<4 then bnst_lv_b.rot2yper360=math.floor(math.random(bnst_lv_b.rot2circumf,100))
+--      else bnst_lv_b.rot2yper360=math.floor(math.random(bnst_lv_b.rot2circumf*0.75,500))
 --      end
 
 			--rot2crazy = like rot1crazy, but this is for the outer spiral
 			--in calculated_constants_bybnst we use rot2crazy to set rot2min and rot2max
-			bnst[lv][b].rot2crazy=beanstalk.get_bval(lv,b,"rot2crazy")    
-			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot2crazy="..bnst[lv][b].rot2crazy)         
+			bnst_lv_b.rot2crazy=beanstalk.get_bval(lv,b,"rot2crazy")
+			--minetest.log("beanstalk-> setting: lv="..lv.." b="..b.." rot2crazy="..bnst_lv_b.rot2crazy)
 		end --for b
 	end --for lv
 	
@@ -840,6 +851,10 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 
 	--ok, now we know we are in a chunk that has beanstalk in it, so we need to do the work
 	--required to generate the beanstalk
+	
+	local bnst_lv = bnst[lv]
+	local bnst_lv_b = bnst_lv[b]
+	local bnst_lv_b_pos = bnst_lv_b.pos
 
 	--easy reference to commonly used values
 	local t1 = os.clock()
@@ -883,85 +898,85 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 	--y0 is the bottom of the chunk, but if y0<the bottom of the beanstalk, then we
 	--will reset y to the bottom of the beanstalk to avoid wasting cpu
 	y=y0
-	if y<bnst[lv][b].minp.y then
-		y=bnst[lv][b].minp.y  --no need to start below the beanstalk
+	if y<bnst_lv_b.minp.y then
+		y=bnst_lv_b.minp.y  --no need to start below the beanstalk
 	end
 
-	stemthiny=bnst[lv].top-(bnst[lv][b].stemradius*4) --for the "taper off" logic below
+	stemthiny=bnst_lv.top-(bnst_lv_b.stemradius*4) --for the "taper off" logic below
 
-	local c_rootnode = bnst[lv].rnode
-	local c_rootvinenode = bnst[lv].rvnode
-	local c_stemnode = bnst[lv].snode
-	local c_vinenode = bnst[lv].vnode
-	local root_height = bnst[lv].root_top
+	local c_rootnode = bnst_lv.rnode
+	local c_rootvinenode = bnst_lv.rvnode
+	local c_stemnode = bnst_lv.snode
+	local c_vinenode = bnst_lv.vnode
+	local root_height = bnst_lv.root_top
 
 	repeat  --this top repeat is where we loop through the chunk based on y
 
 		--the purpose of this bit of code is to "taper off" the end of the beanstalk at the very top
-		stemradius=bnst[lv][b].stemradius  --default
+		stemradius=bnst_lv_b.stemradius  --default
 		if y>stemthiny then
 			local disttopdown=(y-stemthiny)-1
-			stemradius=bnst[lv][b].stemradius-((disttopdown/4) % bnst[lv][b].stemradius)
+			stemradius=bnst_lv_b.stemradius-((disttopdown/4) % bnst_lv_b.stemradius)
 			--minetest.log("bnstt stemradius="..stemradius)
 		end
 
 		--calculate rot1crazy
-		rot1radius=bnst[lv][b].rot1radius
-		if bnst[lv][b].rot1crazy>0 then
-			if bnst[lv][b].noise1==nil then
+		rot1radius=bnst_lv_b.rot1radius
+		if bnst_lv_b.rot1crazy>0 then
+			if bnst_lv_b.noise1==nil then
 				--couldn't create the noise before mapgen, so doing it now (and only once per beanstalk)
 				--I really only need 1d noise.  chulens defines the area of noise generated
 				--I am defining the x axis only
-				local chulens = {x=bnst[lv].height, y=1, z=1}
+				local chulens = {x=bnst_lv.height, y=1, z=1}
 				local minposxz = {x=0, y=0}
-				--minetest.log("beanstalk-> crazy check lv="..lv.." b="..b.." bnst[lv][b].seed="..luautils.var_or_nil(bnst[lv][b].seed))
-				np_crazy.seed=bnst[lv][b].seed
+				--minetest.log("beanstalk-> crazy check lv="..lv.." b="..b.." bnst_lv_b.seed="..luautils.var_or_nil(bnst_lv_b.seed))
+				np_crazy.seed=bnst_lv_b.seed
 				--really might want to change some of the other values based on how big the crazy number is?
-				bnst[lv][b].noise1 = minetest.get_perlin_map(np_crazy, chulens):get_2d_map_flat(minposxz)
+				bnst_lv_b.noise1 = minetest.get_perlin_map(np_crazy, chulens):get_2d_map_flat(minposxz)
 				--now noise1 is an array indexed from 1 to height and
 				--with each value in the range from -1 to 1 with fairly smooth changes
 			end --if noise==nil
 			--so I've got a noise number from -1 to 1, I need to turn it into a radius in the range min to max
-			local midrange=(bnst[lv][b].rot1max-bnst[lv][b].rot1min)/2 --middle of our range
-			ylvl=y-bnst[lv][b].pos.y+1 --the array goes from 1 up, so we add 1
-			rot1radius=math.floor(bnst[lv][b].rot1min+(midrange+(midrange*bnst[lv][b].noise1[ylvl])))
+			local midrange=(bnst_lv_b.rot1max-bnst_lv_b.rot1min)/2 --middle of our range
+			ylvl=y-bnst_lv_b_pos.y+1 --the array goes from 1 up, so we add 1
+			rot1radius=math.floor(bnst_lv_b.rot1min+(midrange+(midrange*bnst_lv_b.noise1[ylvl])))
 		end --if rot1crazy>0
 
 		--calculate rot2crazy
-		rot2radius=bnst[lv][b].rot2radius
-		if bnst[lv][b].rot2crazy>0 then
-			if bnst[lv][b].noise2==nil then
+		rot2radius=bnst_lv_b.rot2radius
+		if bnst_lv_b.rot2crazy>0 then
+			if bnst_lv_b.noise2==nil then
 				--couldn't create the noise before mapgen, so doing it now
-				local chulens = {x=bnst[lv].height, y=1, z=1}
+				local chulens = {x=bnst_lv.height, y=1, z=1}
 				local minposxz = {x=0, y=0}
-				np_crazy.seed=bnst[lv][b].seed*2  --times 2 so it will be different than noise1
-				bnst[lv][b].noise2 = minetest.get_perlin_map(np_crazy, chulens):get_2d_map_flat(minposxz)
-				local midrange=(bnst[lv][b].rot2max-bnst[lv][b].rot2min)/2
+				np_crazy.seed=bnst_lv_b.seed*2  --times 2 so it will be different than noise1
+				bnst_lv_b.noise2 = minetest.get_perlin_map(np_crazy, chulens):get_2d_map_flat(minposxz)
+				local midrange=(bnst_lv_b.rot2max-bnst_lv_b.rot2min)/2
 			end --if noise2==nil
 			--so I've got a number from -1 to 1, I need to turn it into a radius in the range min to max
-			local midrange=(bnst[lv][b].rot2max-bnst[lv][b].rot2min)/2
-			ylvl=y-bnst[lv][b].pos.y+1 --the array goes from 1 up, so we add 1
-			rot2radius=math.floor(bnst[lv][b].rot2min+(midrange+(midrange*bnst[lv][b].noise2[ylvl])))
+			local midrange=(bnst_lv_b.rot2max-bnst_lv_b.rot2min)/2
+			ylvl=y-bnst_lv_b_pos.y+1 --the array goes from 1 up, so we add 1
+			rot2radius=math.floor(bnst_lv_b.rot2min+(midrange+(midrange*bnst_lv_b.noise2[ylvl])))
 		 end --if rot2crazy>0
 
 		--now, if we had "crazy" we set local rot1radius and rot2radius above.  if we didnt
 		--the same locals were set to the beanstalk values.  we use the local values below
 
 		--lets get the beanstalk center based on secondary spiral
-		a2=(360/bnst[lv][b].rot2yper360)*(y % bnst[lv][b].rot2yper360)*bnst[lv][b].rot2dir
-		cx=bnst[lv][b].pos.x+rot2radius*math.cos(a2*math.pi/180)
-		cz=bnst[lv][b].pos.z+rot2radius*math.sin(a2*math.pi/180)
+		a2=(360/bnst_lv_b.rot2yper360)*(y % bnst_lv_b.rot2yper360)*bnst_lv_b.rot2dir
+		cx=bnst_lv_b_pos.x+rot2radius*math.cos(a2*math.pi/180)
+		cz=bnst_lv_b_pos.z+rot2radius*math.sin(a2*math.pi/180)
 		--now cx and cz are the new center of the beanstalk
 
-		for v=1, bnst[lv][b].stemtot do --calculate centers for each vine
+		for v=1, bnst_lv_b.stemtot do --calculate centers for each vine
 			-- an attempt to explain this rather complicated looking formula:
-			-- (360/bnst[lv][b].stemtot)*v       gives me starting angle for this vine
-			-- +(360/bnst[lv][b].rot1yper360) the change in angle for each y up
-			--   (y-bnst[lv][b].pos.y)        the y pos in this beanstalk
-			--                         % bnst[lv][b].rot1yper360)  get mod of yper360, together this gives us how many y up we are (for this section)
-			-- *((y-bnst[lv][b].pos.y) % bnst[lv][b].rot1yper360)  multiply change in angle for each y, by how many y up we are in this section
-			-- *bnst[lv][b].rot1dir  makes us rotate clockwise or counter clockwise
-			a1=(360/bnst[lv][b].stemtot)*v+(360/bnst[lv][b].rot1yper360)*((y-bnst[lv][b].pos.y) % bnst[lv][b].rot1yper360)*bnst[lv][b].rot1dir
+			-- (360/bnst_lv_b.stemtot)*v       gives me starting angle for this vine
+			-- +(360/bnst_lv_b.rot1yper360) the change in angle for each y up
+			--   (y-bnst_lv_b_pos.y)        the y pos in this beanstalk
+			--                         % bnst_lv_b.rot1yper360)  get mod of yper360, together this gives us how many y up we are (for this section)
+			-- *((y-bnst_lv_b_pos.y) % bnst_lv_b.rot1yper360)  multiply change in angle for each y, by how many y up we are in this section
+			-- *bnst_lv_b.rot1dir  makes us rotate clockwise or counter clockwise
+			a1=(360/bnst_lv_b.stemtot)*v+(360/bnst_lv_b.rot1yper360)*((y-bnst_lv_b_pos.y) % bnst_lv_b.rot1yper360)*bnst_lv_b.rot1dir
 			--now that we have the rot2 center cx,cz, and the offset angle, we can calculate the center of this vine
 			stemx[v]=cx+rot1radius*math.cos(a1*math.pi/180)
 			stemz[v]=cz+rot1radius*math.sin(a1*math.pi/180)
@@ -1001,11 +1016,11 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 						end --changed vines
 					end  --if dist
 					v=v+1 --next vine
-				until v > bnst[lv][b].stemtot or changedthis==true
+				until v > bnst_lv_b.stemtot or changedthis==true
 				--add air around the stalk.  (so if we drill through a floating island or another level of land, the beanstalk will have room to climb)
-				if changedthis==false and (math.sqrt((x-cx)^2+(z-cz)^2) <= bnst[lv][b].totradius)
-						and (y > bnst[lv][b].pos.y+100) and (vm_data[vi]~=c_air) then
-					--minetest.log("bnstR setting air=false dist="..math.sqrt((x-cx)^2+(z-cz)^2).." totradius="..bnst[lv][b].totradius.." cx="..cx.." cz="..cz.." y="..y)
+				if changedthis==false and (math.sqrt((x-cx)^2+(z-cz)^2) <= bnst_lv_b.totradius)
+						and (y > bnst_lv_b_pos.y+100) and (vm_data[vi]~=c_air) then
+					--minetest.log("bnstR setting air=false dist="..math.sqrt((x-cx)^2+(z-cz)^2).." totradius="..bnst_lv_b.totradius.." cx="..cx.." cz="..cz.." y="..y)
 					vm_data[vi]=c_air
 					changedany=true
 				end --if changedthis=false
@@ -1013,7 +1028,7 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 		end --for x
 
 		y=y+1 --next y
-	until y>bnst[lv][b].maxp.y or y>y1
+	until y>bnst_lv_b.maxp.y or y>y1
 
 
 	--if changedany==true and realms==nil then
@@ -1088,6 +1103,7 @@ end --go_beanstalk
 --register the list_beanstalk chat command
 minetest.register_chatcommand("list_beanstalks", {
 	params = "",
+	privs = {server=true},	
 	description = "list_beanstalks: list the beanstalk locations",
 	func = function (name, param)
 		beanstalk.list_beanstalks(name)
@@ -1097,6 +1113,7 @@ minetest.register_chatcommand("list_beanstalks", {
 --register the go_beanstalk chat command
 minetest.register_chatcommand("go_beanstalk", {
 	params = "<lv>,<b>",
+	privs = {server=true},
 	description = "go_beanstalk <lv>,<b>: teleport to beanstalk location",
 	func = function (name,param)
 		beanstalk.go_beanstalk(name,param)
@@ -1113,7 +1130,7 @@ beanstalk.read_beanstalks()
 --this is what makes the beanstalk function run every time a chunk is generated
 --if realms~=nil then realms.register_rmg("beanstalks",beanstalk.gen_beanstalk_realms)
 --else minetest.register_on_generated(beanstalk.gen_beanstalk)
---end 
+--end
 minetest.register_on_generated(beanstalk.gen_beanstalk)
 
 
