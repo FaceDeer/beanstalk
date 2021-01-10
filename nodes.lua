@@ -15,6 +15,23 @@ minetest.register_node("beanstalk:beanstalk1", {
   --end,
 })
 
+minetest.register_node("beanstalk:leaf1", {
+  description = "Beanstalk Leaf1",
+  tiles = {"beanstalk1_top_32.png^[multiply:#CCCCCC", "beanstalk1_top_32.png^[multiply:#CCCCCC", "beanstalk1_side_32.png^[multiply:#CCCCCC"},
+  paramtype2 = "facedir",
+  drawtype="nodebox",
+  node_box = {
+    type = "fixed",
+    fixed = {-0.5, 0.25, -0.5, 0.5, 0.5, 0.5},
+  },
+  is_ground_content = false,
+  --climbable = true,
+  groups = {snappy=1,level=2,choppy=1,level=2},
+  sounds = default.node_sound_wood_defaults(),
+  on_place = minetest.rotate_node,
+  --end,	
+})
+
 --this registers the vine node.  later we might want to make this so
 --that it only registers a new node if you are not using a mod that
 --already has vines.

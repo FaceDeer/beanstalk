@@ -359,7 +359,7 @@ function beanstalk.get_bval(lv,b,tag)
 	end --if b>0
 	local rslt
 	--only call string_math if tag is not one of our text tags
-	if tag~="snode" and tag~="vnode" and tag~="enforce_min_rot1rad" and tag~="rnode" and tag~="rvnode" then
+	if tag~="snode" and tag~="vnode" and tag~="enforce_min_rot1rad" and tag~="rnode" and tag~="rvnode" and tag ~= "lnode" then
 		valfrm=luautils.string_math(valfrm,vars)
 		valto=luautils.string_math(valto,vars)
 	end
@@ -433,6 +433,11 @@ function beanstalk.calculated_constants_bylevel()
 			bnst[lv].rnode = minetest.get_content_id(rnode)
 			bnst[lv].rvnode = minetest.get_content_id(rvnode)
 			minetest.log("verbose", "beanstalk-> ccbl rnode="..rnode.." rvnode="..rvnode)
+		end
+		local lnode = beanstalk.get_bval(lv,0,"lnode")
+		if lnode ~= nil then
+			bnst[lv].lnode = minetest.get_content_id(lnode)
+			minetest.log("verbose", "beanstalk-> ccbl lnode="..lnode)
 		end
 
 		bnst[lv].per_row=math.floor(math.sqrt(bnst[lv].count))  --beanstalks per row are the sqrt of beanstalks per level
@@ -800,6 +805,40 @@ return changed
 end --checkvines
 
 
+local facedir_to_dir = {
+	[0]={x= 0, y=0,  z= 1},
+	{x= 1, y=0,  z= 0},
+	{x= 0, y=0,  z=-1},
+	{x=-1, y=0,  z= 0},
+}
+
+function make_leaf(data, area, pos, facedir, c_leaf, c_stem, c_vine)
+	local dir = facedir_to_dir[facedir]
+	local length_stride = dir.x + dir.z * area.zstride
+	local width_stride = dir.z + dir.x * area.zstride
+	local vi = area:indexp(pos)
+	for vw = vi-width_stride*2, vi+width_stride*2, width_stride do
+		for vl = vw, vw+length_stride*6, length_stride do
+			if data[vl] ~= c_air and data[vi] ~= c_vine then
+				minetest.debug("obstructed")
+				return -- obstruction
+			end
+		end
+	end
+	for vw = vi-width_stride*2, vi+width_stride*2, width_stride do
+		local total_length = vw+length_stride*6
+		for vl = vw, total_length, length_stride do
+			if vw == vi and vl < total_length then
+				-- we're positioned along the centerline of the leaf, add stem
+				data[vl] = c_stem
+			elseif vl ~= vw then
+				-- we're not in the first row of the leaf (which should be stem only), so add leaf
+				data[vl] = c_leaf
+			end
+		end
+	end
+end
+
 --this is the function that will generate beanstalks for the realms mod
 --be sure to define the realm as the whole world -33000,-33000,-33000 to 33000,33000,33000
 function beanstalk.gen_beanstalk_realms(parms)
@@ -909,6 +948,7 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 	local c_stemnode = bnst_lv.snode
 	local c_vinenode = bnst_lv.vnode
 	local root_height = bnst_lv.root_top
+	local c_leaf = bnst_lv.lnode
 
 	repeat  --this top repeat is where we loop through the chunk based on y
 
@@ -919,6 +959,11 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 			stemradius=bnst_lv_b.stemradius-((disttopdown/4) % bnst_lv_b.stemradius)
 			--minetest.log("bnstt stemradius="..stemradius)
 		end
+
+		-- stem radius is squared so that we won't need to use square root in distance comparisons, below
+		-- square root is a relatively expensive math operation.
+		local stemradius_squared = stemradius * stemradius
+		local stemradius_plus_one_squared = (stemradius + 1) * (stemradius + 1)
 
 		--calculate rot1crazy
 		rot1radius=bnst_lv_b.rot1radius
@@ -982,33 +1027,34 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 			stemz[v]=cz+rot1radius*math.sin(a1*math.pi/180)
 		end --for v
 
+		local c_stem
+		local c_vine
+		if root_height and y < root_height then
+			c_stem = c_rootnode
+			c_vine = c_rootvinenode
+		else
+			c_stem = c_stemnode
+			c_vine = c_vinenode
+		end
+
 		--we are inside the repeat loop that loops through the chunk based on y (from bottom up)
 		--these two for loops loop through the chunk based x and z
 		--changedthis says if there was a change in the z loop.  changedany says if there was a change in the whole chunk
 		for x=x0, x1 do
 			for z=z0, z1 do
-				local c_stem
-				local c_vine
-				if root_height and y < root_height then
-					c_stem = c_rootnode
-					c_vine = c_rootvinenode
-				else
-					c_stem = c_stemnode
-					c_vine = c_vinenode
-				end
 				local vi = area:index(x, y, z) -- This accesses the node at a given position
 				local changedthis=false
 				local v=1
 				repeat  --loops through the vines until we set the node or run out of vines
-					local dist=math.sqrt((x-stemx[v])^2+(z-stemz[v])^2)
-					if dist <= stemradius then  --inside stalk
+					local dist=(x-stemx[v])^2+(z-stemz[v])^2
+					if dist <= stemradius_squared then  --inside stalk
 						vm_data[vi]= c_stem
 						changedany=true
 						changedthis=true
 						--minetest.log("--- -- stalk placed at x="..x.." y="..y.." z="..z.." (v="..v..")")
 					--this else says to check for adding climbing vines if we are 1 node outside stalk of a beanstalk vine
 					--(it is confusing that I call them both vine.  I should have called it stalks and vines)
-					elseif dist<=(stemradius+1) then --one node outside stalk
+					elseif dist<=(stemradius_plus_one_squared) then --one node outside stalk
 						if beanstalk.checkvines(lv, x,y,z, stemx[v],stemz[v], area,vm_data, c_stem,c_vine)==true then
 							changedany=true
 							changedthis=true
@@ -1026,6 +1072,16 @@ function beanstalk.gen_beanstalk(minp, maxp, seed, parms)
 				end --if changedthis=false
 			end --for z
 		end --for x
+		
+		if c_leaf and (not root_height or y > root_height) then
+			local leaf_dir = y % 4
+			local leaf_displace = vector.multiply(facedir_to_dir[leaf_dir], stemradius)
+			for v=1, bnst_lv_b.stemtot do
+				local stem_pos = vector.round({x=stemx[v], y=y, z=stemz[v]})
+				local leaf_pos = vector.add(stem_pos, leaf_displace)
+				make_leaf(vm_data, area, leaf_pos, leaf_dir, c_leaf, c_stem, c_vine)
+			end
+		end
 
 		y=y+1 --next y
 	until y>bnst_lv_b.maxp.y or y>y1
