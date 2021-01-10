@@ -820,7 +820,6 @@ function make_leaf(data, area, pos, facedir, c_leaf, c_stem, c_vine)
 	for vw = vi-width_stride*2, vi+width_stride*2, width_stride do
 		for vl = vw, vw+length_stride*6, length_stride do
 			if data[vl] ~= c_air and data[vi] ~= c_vine then
-				minetest.debug("obstructed")
 				return -- obstruction
 			end
 		end
